@@ -1,0 +1,1159 @@
+{
+  "generated_at": "2026-10-22T13:17:26",
+  "meta": {
+    "repo": "/home/user/Doubao/chats/38448592381610754/demo_precheck/repo",
+    "mode": "pr",
+    "mode_desc": "PR 范围 prod_1.0.0...feat_tenant_lease（三点语法，从共同祖先开始比较）",
+    "base": "prod_1.0.0",
+    "feature": "feat_tenant_lease",
+    "cases_file": "./cases/lease_cases.xlsx"
+  },
+  "total": 10,
+  "distribution": {
+    "已覆盖": 4,
+    "部分覆盖": 2,
+    "未实现": 1,
+    "无法判定": 2,
+    "存在偏差": 1
+  },
+  "cases": [
+    {
+      "id": "TC-001",
+      "title": "正常创建租赁合同",
+      "module": "合同管理",
+      "priority": "P0",
+      "status": "已覆盖",
+      "confidence": "medium",
+      "reason": "变更代码中存在与用例规则匹配的实现，建议冒烟时重点验证关键分支",
+      "missing": "规则类型均已命中，仍需确认阈值/分支是否完全一致",
+      "suggestion": "冒烟阶段重点验证该用例的关键分支与边界；若依赖未变更的公共模块，请顺带人工确认该模块实现。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "date",
+        "error",
+        "required",
+        "status"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "auth",
+        "date",
+        "enum",
+        "error",
+        "length",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 5,
+          "text": "def _validate(data):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 6,
+          "text": "# 必填字段校验"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 7,
+          "text": "for field in (\"tenant_id\", \"start_date\", \"end_date\", \"rent\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 11,
+          "text": "# 租户名称必填（长度上限校验暂未实现）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 12,
+          "text": "if not data.get(\"tenant_name\", \"\").strip():"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 15,
+          "text": "# 合同结束日期不能早于开始日期"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 16,
+          "text": "if data[\"end_date\"] < data[\"start_date\"]:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 32,
+          "text": "# 权限：非管理员不能审批（校验逻辑依赖公共 auth 模块）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 33,
+          "text": "if not auth.has_permission(user, \"LEASE_APPROVE\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 35,
+          "text": "_validate(data)"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 40,
+          "text": "\"start_date\": data[\"start_date\"],"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 41,
+          "text": "\"end_date\": data[\"end_date\"],"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 43,
+          "text": "\"status\": \"DRAFT\","
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        }
+      ]
+    },
+    {
+      "id": "TC-002",
+      "title": "合同结束日期早于开始日期被拒绝",
+      "module": "合同管理",
+      "priority": "P0",
+      "status": "已覆盖",
+      "confidence": "medium",
+      "reason": "变更代码中存在与用例规则匹配的实现，建议冒烟时重点验证关键分支",
+      "missing": "规则类型均已命中，仍需确认阈值/分支是否完全一致",
+      "suggestion": "冒烟阶段重点验证该用例的关键分支与边界；若依赖未变更的公共模块，请顺带人工确认该模块实现。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "date",
+        "error"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "date",
+        "enum",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 5,
+          "text": "def _validate(data):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 7,
+          "text": "for field in (\"tenant_id\", \"start_date\", \"end_date\", \"rent\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 15,
+          "text": "# 合同结束日期不能早于开始日期"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 16,
+          "text": "if data[\"end_date\"] < data[\"start_date\"]:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 35,
+          "text": "_validate(data)"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 40,
+          "text": "\"start_date\": data[\"start_date\"],"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 41,
+          "text": "\"end_date\": data[\"end_date\"],"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-003",
+      "title": "租金必须大于0",
+      "module": "合同管理",
+      "priority": "P0",
+      "status": "已覆盖",
+      "confidence": "medium",
+      "reason": "变更代码中存在与用例规则匹配的实现，建议冒烟时重点验证关键分支",
+      "missing": "规则类型均已命中，仍需确认阈值/分支是否完全一致",
+      "suggestion": "冒烟阶段重点验证该用例的关键分支与边界；若依赖未变更的公共模块，请顺带人工确认该模块实现。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "error",
+        "range"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "date",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 16,
+          "text": "if data[\"end_date\"] < data[\"start_date\"]:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 19,
+          "text": "# 租金必须大于0"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 20,
+          "text": "if data[\"rent\"] <= 0:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "租户名称必填且长度不超过50字符",
+      "module": "合同管理",
+      "priority": "P1",
+      "status": "部分覆盖",
+      "confidence": "high",
+      "reason": "租户名称必填已实现（lease_service.py:13），但长度不超过50字符的校验缺失（注释第11行明确标注\"暂未实现\"）",
+      "missing": "租户名称长度上限（50字符）校验未实现",
+      "suggestion": "同步开发补充名称长度校验；补齐后重新执行预检确认。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "error",
+        "length",
+        "range",
+        "required",
+        "status"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "auth",
+        "date",
+        "enum",
+        "error",
+        "length",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 6,
+          "text": "# 必填字段校验"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 11,
+          "text": "# 租户名称必填（长度上限校验暂未实现）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 12,
+          "text": "if not data.get(\"tenant_name\", \"\").strip():"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 16,
+          "text": "if data[\"end_date\"] < data[\"start_date\"]:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 19,
+          "text": "# 租金必须大于0"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 20,
+          "text": "if data[\"rent\"] <= 0:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 32,
+          "text": "# 权限：非管理员不能审批（校验逻辑依赖公共 auth 模块）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 33,
+          "text": "if not auth.has_permission(user, \"LEASE_APPROVE\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 43,
+          "text": "\"status\": \"DRAFT\","
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        }
+      ]
+    },
+    {
+      "id": "TC-005",
+      "title": "同一房源同一租户重复提交提示合同已存在",
+      "module": "合同管理",
+      "priority": "P1",
+      "status": "未实现",
+      "confidence": "medium",
+      "reason": "命中行均为必填/日期/租金校验的 raise 与统一错误码返回，与\"重复提交\"无关；本次变更代码中无任何去重/幂等/已存在判断逻辑",
+      "missing": "重复提交校验（同一房源+同一租户）无对应实现",
+      "suggestion": "同步开发在创建前查询未结束合同并返回\"合同已存在\"；实现后回归该用例。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "dedup",
+        "error"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "date",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-006",
+      "title": "已生效合同不可修改",
+      "module": "合同管理",
+      "priority": "P1",
+      "status": "部分覆盖",
+      "confidence": "medium",
+      "reason": "已实现\"已生效合同不可修改\"（lease_service.py:56），但仅拦截 ACTIVE 状态，TERMINATED、审批中等其他不可编辑状态未处理，边界不完整",
+      "missing": "状态边界不完整：仅拦截 ACTIVE，TERMINATED/审批中未处理",
+      "suggestion": "补齐不可编辑状态集合（ACTIVE/TERMINATED/审批中等），或确认业务上仅 ACTIVE 需拦截。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "error",
+        "status"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "auth",
+        "date",
+        "enum",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 32,
+          "text": "# 权限：非管理员不能审批（校验逻辑依赖公共 auth 模块）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 33,
+          "text": "if not auth.has_permission(user, \"LEASE_APPROVE\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 43,
+          "text": "\"status\": \"DRAFT\","
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 54,
+          "text": "# 已生效合同不可修改（仅拦截 ACTIVE，TERMINATED/审批中状态未处理）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 55,
+          "text": "if contract[\"status\"] == \"ACTIVE\":"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-007",
+      "title": "无审批权限用户提交审批被拒绝",
+      "module": "合同管理",
+      "priority": "P1",
+      "status": "无法判定",
+      "confidence": "medium",
+      "reason": "权限校验调用公共模块 auth.has_permission（lease_service.py:34），该模块未包含在本次变更中，角色判定是否完整、是否覆盖全部审批入口需人工确认",
+      "missing": "依赖未变更的公共 auth 模块，静态代码无法确认完整性与覆盖面",
+      "suggestion": "人工确认 auth 模块的 LEASE_APPROVE 权限判定实现与调用点覆盖；确认后改判。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "error",
+        "permission",
+        "status"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "auth",
+        "date",
+        "enum",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 32,
+          "text": "# 权限：非管理员不能审批（校验逻辑依赖公共 auth 模块）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 33,
+          "text": "if not auth.has_permission(user, \"LEASE_APPROVE\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 43,
+          "text": "\"status\": \"DRAFT\","
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 54,
+          "text": "# 已生效合同不可修改（仅拦截 ACTIVE，TERMINATED/审批中状态未处理）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 55,
+          "text": "if contract[\"status\"] == \"ACTIVE\":"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-008",
+      "title": "合同金额超过单笔上限应拒绝",
+      "module": "合同管理",
+      "priority": "P1",
+      "status": "存在偏差",
+      "confidence": "high",
+      "reason": "变更代码中与用例业务规则（amount）相关的位置存在 TODO/占位/待实现标记，与用例预期不一致，建议确认是否已真正实现",
+      "missing": "存在 TODO/占位标记，未确认是否为最终实现",
+      "suggestion": "与开发对齐占位/待实现位置，确认是未完成还是可接受范围，并同步测试冒烟重点。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "amount",
+        "error"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "date",
+        "enum",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 7,
+          "text": "for field in (\"tenant_id\", \"start_date\", \"end_date\", \"rent\"):"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 20,
+          "text": "if data[\"rent\"] <= 0:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 23,
+          "text": "# 金额上限校验（占位，待实现）"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 42,
+          "text": "\"rent\": data[\"rent\"],"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-009",
+      "title": "最大续约次数由配置中心控制",
+      "module": "合同管理",
+      "priority": "P2",
+      "status": "无法判定",
+      "confidence": "medium",
+      "reason": "最大续约次数由配置中心控制，属运行时行为；本次变更代码中无相关实现，静态代码无法确认是否已生效",
+      "missing": "配置中心/运行时行为，超出静态预检能力",
+      "suggestion": "人工确认配置项是否存在、是否接入续约接口；确认后改判为已覆盖或未实现。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "error",
+        "range"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "date",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 16,
+          "text": "if data[\"end_date\"] < data[\"start_date\"]:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 19,
+          "text": "# 租金必须大于0"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 20,
+          "text": "if data[\"rent\"] <= 0:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    },
+    {
+      "id": "TC-010",
+      "title": "创建失败时返回统一错误码",
+      "module": "接口层",
+      "priority": "P1",
+      "status": "已覆盖",
+      "confidence": "medium",
+      "reason": "变更代码中存在与用例规则匹配的实现，建议冒烟时重点验证关键分支",
+      "missing": "规则类型均已命中，仍需确认阈值/分支是否完全一致",
+      "suggestion": "冒烟阶段重点验证该用例的关键分支与边界；若依赖未变更的公共模块，请顺带人工确认该模块实现。",
+      "files_hit": [
+        "lease_service.py"
+      ],
+      "rule_types_in_case": [
+        "error"
+      ],
+      "rule_types_matched": [
+        "amount",
+        "date",
+        "error",
+        "permission",
+        "range",
+        "required",
+        "status"
+      ],
+      "identifiers": [
+        "code",
+        "message"
+      ],
+      "evidence": [
+        {
+          "file": "lease_service.py",
+          "line": 9,
+          "text": "raise ValueError(f\"{field} 为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 13,
+          "text": "raise ValueError(\"租户名称为必填项\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 17,
+          "text": "raise ValueError(\"合同结束日期不能早于开始日期\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 21,
+          "text": "raise ValueError(\"租金必须大于0\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 24,
+          "text": "# TODO: 合同金额超过单笔上限时应拒绝"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 34,
+          "text": "raise PermissionError(\"非管理员不能审批\")"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 46,
+          "text": "return {\"code\": 0, \"data\": contract}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 47,
+          "text": "except ValueError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 48,
+          "text": "return {\"code\": 4001, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 49,
+          "text": "except PermissionError as e:"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 50,
+          "text": "return {\"code\": 4003, \"message\": str(e)}"
+        },
+        {
+          "file": "lease_service.py",
+          "line": 56,
+          "text": "raise PermissionError(\"已生效合同不可修改\")"
+        }
+      ]
+    }
+  ],
+  "note": "已由 AI 结合 diff 原文复核：修正了误命中（TC-005/TC-009）、边界不完整（TC-006）、公共模块依赖（TC-007）等判定。最终以本文件为准。",
+  "reviewed": true,
+  "reviewed_at": "2026-10-22T13:18:11"
+}

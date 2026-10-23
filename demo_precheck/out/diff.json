@@ -1,0 +1,265 @@
+{
+  "repo": "/home/user/Doubao/chats/38448592381610754/demo_precheck/repo",
+  "mode": "pr",
+  "mode_desc": "PR 范围 prod_1.0.0...feat_tenant_lease（三点语法，从共同祖先开始比较）",
+  "base": "prod_1.0.0",
+  "feature": "feat_tenant_lease",
+  "generated_at": "2026-10-22T13:14:50",
+  "diff_text": "diff --git a/lease_service.py b/lease_service.py\nindex 0c54cc9..edc88a1 100644\n--- a/lease_service.py\n+++ b/lease_service.py\n@@ -1,24 +1,59 @@\n-\"\"\"租赁合同服务（prod_1.0.0）\"\"\"\n+\"\"\"租赁合同服务（feat_tenant_lease）\"\"\"\n import uuid\n \n \n+def _validate(data):\n+    # 必填字段校验\n+    for field in (\"tenant_id\", \"start_date\", \"end_date\", \"rent\"):\n+        if not data.get(field):\n+            raise ValueError(f\"{field} 为必填项\")\n+\n+    # 租户名称必填（长度上限校验暂未实现）\n+    if not data.get(\"tenant_name\", \"\").strip():\n+        raise ValueError(\"租户名称为必填项\")\n+\n+    # 合同结束日期不能早于开始日期\n+    if data[\"end_date\"] < data[\"start_date\"]:\n+        raise ValueError(\"合同结束日期不能早于开始日期\")\n+\n+    # 租金必须大于0\n+    if data[\"rent\"] <= 0:\n+        raise ValueError(\"租金必须大于0\")\n+\n+    # 金额上限校验（占位，待实现）\n+    # TODO: 合同金额超过单笔上限时应拒绝\n+\n+\n class LeaseService:\n     \"\"\"租赁合同服务\"\"\"\n \n-    def create_lease(self, data):\n-        contract = {\n-            \"id\": str(uuid.uuid4()),\n-            \"tenant_id\": data[\"tenant_id\"],\n-            \"start_date\": data[\"start_date\"],\n-            \"end_date\": data[\"end_date\"],\n-            \"rent\": data[\"rent\"],\n-            \"status\": \"DRAFT\",\n-        }\n-        save(contract)\n-        return contract\n+    def create_lease(self, data, user=None):\n+        try:\n+            # 权限：非管理员不能审批（校验逻辑依赖公共 auth 模块）\n+            if not auth.has_permission(user, \"LEASE_APPROVE\"):\n+                raise PermissionError(\"非管理员不能审批\")\n+            _validate(data)\n+            contract = {\n+                \"id\": str(uuid.uuid4()),\n+                \"tenant_id\": data[\"tenant_id\"],\n+                \"tenant_name\": data.get(\"tenant_name\"),\n+                \"start_date\": data[\"start_date\"],\n+                \"end_date\": data[\"end_date\"],\n+                \"rent\": data[\"rent\"],\n+                \"status\": \"DRAFT\",\n+            }\n+            save(contract)\n+            return {\"code\": 0, \"data\": contract}\n+        except ValueError as e:\n+            return {\"code\": 4001, \"message\": str(e)}\n+        except PermissionError as e:\n+            return {\"code\": 4003, \"message\": str(e)}\n \n     def update_lease(self, contract_id, data):\n         contract = find(contract_id)\n+        # 已生效合同不可修改（仅拦截 ACTIVE，TERMINATED/审批中状态未处理）\n+        if contract[\"status\"] == \"ACTIVE\":\n+            raise PermissionError(\"已生效合同不可修改\")\n         contract.update(data)\n         save(contract)\n         return contract\n",
+  "files": [
+    {
+      "path": "lease_service.py",
+      "change_type": "M",
+      "binary": false,
+      "additions": 47,
+      "deletions": 12,
+      "hunks": [
+        {
+          "start_old": 1,
+          "start_new": 1,
+          "added": [
+            {
+              "line": 1,
+              "text": "\"\"\"租赁合同服务（feat_tenant_lease）\"\"\""
+            },
+            {
+              "line": 5,
+              "text": "def _validate(data):"
+            },
+            {
+              "line": 6,
+              "text": "    # 必填字段校验"
+            },
+            {
+              "line": 7,
+              "text": "    for field in (\"tenant_id\", \"start_date\", \"end_date\", \"rent\"):"
+            },
+            {
+              "line": 8,
+              "text": "        if not data.get(field):"
+            },
+            {
+              "line": 9,
+              "text": "            raise ValueError(f\"{field} 为必填项\")"
+            },
+            {
+              "line": 10,
+              "text": ""
+            },
+            {
+              "line": 11,
+              "text": "    # 租户名称必填（长度上限校验暂未实现）"
+            },
+            {
+              "line": 12,
+              "text": "    if not data.get(\"tenant_name\", \"\").strip():"
+            },
+            {
+              "line": 13,
+              "text": "        raise ValueError(\"租户名称为必填项\")"
+            },
+            {
+              "line": 14,
+              "text": ""
+            },
+            {
+              "line": 15,
+              "text": "    # 合同结束日期不能早于开始日期"
+            },
+            {
+              "line": 16,
+              "text": "    if data[\"end_date\"] < data[\"start_date\"]:"
+            },
+            {
+              "line": 17,
+              "text": "        raise ValueError(\"合同结束日期不能早于开始日期\")"
+            },
+            {
+              "line": 18,
+              "text": ""
+            },
+            {
+              "line": 19,
+              "text": "    # 租金必须大于0"
+            },
+            {
+              "line": 20,
+              "text": "    if data[\"rent\"] <= 0:"
+            },
+            {
+              "line": 21,
+              "text": "        raise ValueError(\"租金必须大于0\")"
+            },
+            {
+              "line": 22,
+              "text": ""
+            },
+            {
+              "line": 23,
+              "text": "    # 金额上限校验（占位，待实现）"
+            },
+            {
+              "line": 24,
+              "text": "    # TODO: 合同金额超过单笔上限时应拒绝"
+            },
+            {
+              "line": 25,
+              "text": ""
+            },
+            {
+              "line": 26,
+              "text": ""
+            },
+            {
+              "line": 30,
+              "text": "    def create_lease(self, data, user=None):"
+            },
+            {
+              "line": 31,
+              "text": "        try:"
+            },
+            {
+              "line": 32,
+              "text": "            # 权限：非管理员不能审批（校验逻辑依赖公共 auth 模块）"
+            },
+            {
+              "line": 33,
+              "text": "            if not auth.has_permission(user, \"LEASE_APPROVE\"):"
+            },
+            {
+              "line": 34,
+              "text": "                raise PermissionError(\"非管理员不能审批\")"
+            },
+            {
+              "line": 35,
+              "text": "            _validate(data)"
+            },
+            {
+              "line": 36,
+              "text": "            contract = {"
+            },
+            {
+              "line": 37,
+              "text": "                \"id\": str(uuid.uuid4()),"
+            },
+            {
+              "line": 38,
+              "text": "                \"tenant_id\": data[\"tenant_id\"],"
+            },
+            {
+              "line": 39,
+              "text": "                \"tenant_name\": data.get(\"tenant_name\"),"
+            },
+            {
+              "line": 40,
+              "text": "                \"start_date\": data[\"start_date\"],"
+            },
+            {
+              "line": 41,
+              "text": "                \"end_date\": data[\"end_date\"],"
+            },
+            {
+              "line": 42,
+              "text": "                \"rent\": data[\"rent\"],"
+            },
+            {
+              "line": 43,
+              "text": "                \"status\": \"DRAFT\","
+            },
+            {
+              "line": 44,
+              "text": "            }"
+            },
+            {
+              "line": 45,
+              "text": "            save(contract)"
+            },
+            {
+              "line": 46,
+              "text": "            return {\"code\": 0, \"data\": contract}"
+            },
+            {
+              "line": 47,
+              "text": "        except ValueError as e:"
+            },
+            {
+              "line": 48,
+              "text": "            return {\"code\": 4001, \"message\": str(e)}"
+            },
+            {
+              "line": 49,
+              "text": "        except PermissionError as e:"
+            },
+            {
+              "line": 50,
+              "text": "            return {\"code\": 4003, \"message\": str(e)}"
+            },
+            {
+              "line": 54,
+              "text": "        # 已生效合同不可修改（仅拦截 ACTIVE，TERMINATED/审批中状态未处理）"
+            },
+            {
+              "line": 55,
+              "text": "        if contract[\"status\"] == \"ACTIVE\":"
+            },
+            {
+              "line": 56,
+              "text": "            raise PermissionError(\"已生效合同不可修改\")"
+            }
+          ],
+          "removed": [
+            {
+              "line": 1,
+              "text": "\"\"\"租赁合同服务（prod_1.0.0）\"\"\""
+            },
+            {
+              "line": 8,
+              "text": "    def create_lease(self, data):"
+            },
+            {
+              "line": 9,
+              "text": "        contract = {"
+            },
+            {
+              "line": 10,
+              "text": "            \"id\": str(uuid.uuid4()),"
+            },
+            {
+              "line": 11,
+              "text": "            \"tenant_id\": data[\"tenant_id\"],"
+            },
+            {
+              "line": 12,
+              "text": "            \"start_date\": data[\"start_date\"],"
+            },
+            {
+              "line": 13,
+              "text": "            \"end_date\": data[\"end_date\"],"
+            },
+            {
+              "line": 14,
+              "text": "            \"rent\": data[\"rent\"],"
+            },
+            {
+              "line": 15,
+              "text": "            \"status\": \"DRAFT\","
+            },
+            {
+              "line": 16,
+              "text": "        }"
+            },
+            {
+              "line": 17,
+              "text": "        save(contract)"
+            },
+            {
+              "line": 18,
+              "text": "        return contract"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "untracked": []
+}
